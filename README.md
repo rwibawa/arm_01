@@ -288,6 +288,39 @@ qemu: uncaught target signal 11 (Segmentation fault) - core dumped
 Segmentation fault
 
 # We got Segmentation fault error
+
+$ arm-linux-gnueabi-objdump -d 005.o
+
+005.o:     file format elf32-littlearm
+
+
+Disassembly of section .text:
+
+00000000 <_start>:
+   0:   e3a07004        mov     r7, #4
+   4:   e3a00001        mov     r0, #1
+   8:   e59f1028        ldr     r1, [pc, #40]   ; 38 <exit+0xc>
+   c:   e3a0200d        mov     r2, #13
+  10:   ef000000        svc     0x00000000
+  14:   e59f0020        ldr     r0, [pc, #32]   ; 3c <exit+0x10>
+  18:   e2800001        add     r0, r0, #1
+  1c:   e12fff10        bx      r0
+
+00000020 <hello_world_thumb>:
+  20:   2704            movs    r7, #4
+  22:   2001            movs    r0, #1
+  24:   4904            ldr     r1, [pc, #16]   ; (38 <exit+0xc>)
+  26:   220d            movs    r2, #13
+  28:   df00            svc     0
+        ...
+
+0000002c <exit>:
+  2c:   e3a07001        mov     r7, #1
+  30:   e3a00041        mov     r0, #65 ; 0x41
+  34:   ef000000        svc     0x00000000
+  38:   00000000        .word   0x00000000
+  3c:   00000020        .word   0x00000020
+
 ```
 
 ## We also need to branch to `exit` in order to get back to *arm mode*
@@ -349,38 +382,6 @@ exit:
 
 Output:
 ```sh
-$ arm-linux-gnueabi-objdump -d 005.o
-
-005.o:     file format elf32-littlearm
-
-
-Disassembly of section .text:
-
-00000000 <_start>:
-   0:   e3a07004        mov     r7, #4
-   4:   e3a00001        mov     r0, #1
-   8:   e59f1028        ldr     r1, [pc, #40]   ; 38 <exit+0xc>
-   c:   e3a0200d        mov     r2, #13
-  10:   ef000000        svc     0x00000000
-  14:   e59f0020        ldr     r0, [pc, #32]   ; 3c <exit+0x10>
-  18:   e2800001        add     r0, r0, #1
-  1c:   e12fff10        bx      r0
-
-00000020 <hello_world_thumb>:
-  20:   2704            movs    r7, #4
-  22:   2001            movs    r0, #1
-  24:   4904            ldr     r1, [pc, #16]   ; (38 <exit+0xc>)
-  26:   220d            movs    r2, #13
-  28:   df00            svc     0
-        ...
-
-0000002c <exit>:
-  2c:   e3a07001        mov     r7, #1
-  30:   e3a00041        mov     r0, #65 ; 0x41
-  34:   ef000000        svc     0x00000000
-  38:   00000000        .word   0x00000000
-  3c:   00000020        .word   0x00000020
-
 $ arm-linux-gnueabi-as 005.asm -o 005.o
 $ arm-linux-gnueabi-gcc-9 005.o -o 005.elf -nostdlib -static
 $ ./005.elf 
