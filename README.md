@@ -75,7 +75,48 @@ $ arm-linux-gnueabi-as 003.asm -o 003.o
 $ arm-linux-gnueabi-gcc-9 003.o -o 003.elf -nostdlib
 $ ./003.elf 
 Hello, World
+```
 
+### Completed *Hello World* App
+
+<details>
+   <summary>Show 004.asm</summary>
+
+```asm
+# ARM Assembly Tutorial 001
+
+.global _start
+.section .text
+
+# STDIN - 0
+# STDOUT - 1
+# STDERR - 2
+
+# write a string to stdout
+
+_start:
+# NR 4, syscall: write
+  mov r7, #0x4
+  mov r0, #1        ; # file descriptor (fd=1): STDOUT
+  ldr r1, =message  ; # pointer to the buffer
+  mov r2, #MSG_LEN  ; # buffer count
+  swi 0
+
+# NR 1, syscall: exit
+  mov r7, #0x1
+  mov r0, #65       ; # return code
+  swi 0
+
+.section .data
+  message:
+  .ascii "Hello, World\n"
+  .equ MSG_LEN, . - message
+
+```
+</details>
+
+Output:
+```sh
 $ arm-linux-gnueabi-as 004.asm -o 004.o
 $ arm-linux-gnueabi-gcc-9 004.o -o 004.elf -nostdlib
 $ ./004.elf 
