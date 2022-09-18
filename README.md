@@ -4,6 +4,8 @@ Learn ARM assembly language (with cross compiler).
 * [ARM assembly language](https://youtu.be/FV6P5eRmMh8)
 * [Emulating ARM with QEMU on Debian/Ubuntu](https://gist.github.com/luk6xff/9f8d2520530a823944355e59343eadc1)
 * [ARM System Call Table](https://chromium.googlesource.com/chromiumos/docs/+/master/constants/syscalls.md#arm-32_bit_EABI)
+* [THUMB Mode](https://youtu.be/rsg_Krh-o1U)
+* [Low Level Learning github](https://github.com/lowlevellearning)
 
 > Google 'arm 32 system call table', then select 'arm (32-bit/EABI)'.
 ## 1. Installation
@@ -423,12 +425,74 @@ Disassembly of section .text:
   44:   00000030        .word   0x00000030
 ```
 
+## 4. Make a function call by using the stack
+
+![Call Convention](./img/CallConvention.jpg)
+
+<details>
+   <summary>Show stack.asm</summary>
+
+```asm
+# ARM Stacks
+
+.global _start
+.section .text
+
+_start:
+  bl hello_world        ; # branch and link
+  bl exit               ; # to do a function call
+
+hello_world:
+  push {r4-r11, lr}     ; # Preserve all non-volatile registers
+                        ; # Preserve lr (line #8)
+  mov fp, sp
+  sub sp, sp, #0x40      ; # Add 64 bytes memory to work with
+
+# load a value to r1, then store it in a memory location
+  ldr r1, =#0x1337
+  str r1, [fp, #-0x10]
+
+  mov r7, #0x4
+  mov r0, #1
+  ldr r1, =message
+  mov r2, #MSG_LEN
+  swi 0
+
+  mov sp, fp            ; # set stack pointer back
+  pop {r4-r11, pc}      ; # set link register (lr) to program counter (pc)
+                        ; # in order to return code control to the caller
+
+exit:
+  push {fp, lr}         ; # we don't use r4-r11 registers
+  
+  mov r7, #0x1
+  mov r0, #65
+  swi 0
+
+  pop {fp, pc}          ; return
+
+.section .data
+  message:
+  .ascii "Hello, World\n"
+  .equ MSG_LEN, . - message
+```
+</details>
+
+Output:
+```sh
+$ arm-linux-gnueabi-as stack.asm -o stack.o
+$ arm-linux-gnueabi-gcc-9 stack.o -o stack.elf -nostdlib -static
+$ ./stack.elf 
+Hello, World
+```
+
+
 ## Linux System Call Table
 arm (32-bit/EABI)
 Compiled from Linux 4.14.0 headers.
 
-|NR	|syscall |name	|references	|%r7	|arg0 (%r0)	|arg1 (%r1)	|arg2 (%r2)	|arg3 (%r3)	|arg4 (%r4)	|arg5 (%r5)|
-| :--: | :--: | :--: | :--: | :--: | :--: | :--: | :--: | :--: | :--: | :--: |
+|NR	|syscall name	|references	|%r7	|arg0 (%r0)	|arg1 (%r1)	|arg2 (%r2)	|arg3 (%r3)	|arg4 (%r4)	|arg5 (%r5)|
+| :--: | :--: | :--: | :--: | :--: | :--: | :--: | :--: | :--: | :--: |
 |0	|restart_syscall	|man/ cs/	|0x00|	-|	-|	-|	-|	-|	-|
 |1	|exit	|man/ cs/	|0x01|	int error_code|	-|	-|	-|	-|	-|
 |2	|fork	|man/ cs/	|0x02|	-|	-|	-|	-|	-|	-|
