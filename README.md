@@ -9,6 +9,11 @@ Learn ARM assembly language (with cross compiler).
 ## 1. Installation
 
 ```sh
+$ uname -p
+x86_64
+$ uname -a
+Linux GEO-WCND1383YRS 5.10.102.1-microsoft-standard-WSL2 #1 SMP Wed Mar 2 00:30:59 UTC 2022 x86_64 x86_64 x86_64 GNU/Linux
+
 $ sudo apt-get -y install gcc-arm*
 Reading package lists... Done
 Building dependency tree       
