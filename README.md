@@ -467,6 +467,9 @@ Disassembly of section .text:
 ```
 
 ## 4. Make a function call by using the stack
+In ARM, frame pointer (fp) is *r11* and stack pointer (sp) is *r13*.
+
+* [Getting Started with ARM Stacks](https://youtu.be/7fezHk7nmzY)
 
 ![Call Convention](./img/CallConvention.jpg)
 
@@ -525,8 +528,59 @@ $ arm-linux-gnueabi-as stack.asm -o stack.o
 $ arm-linux-gnueabi-gcc-9 stack.o -o stack.elf -nostdlib -static
 $ ./stack.elf 
 Hello, World
+
+$ arm-linux-gnueabi-objdump -d stack.o
+
+stack.o:     file format elf32-littlearm
+
+
+Disassembly of section .text:
+
+00000000 <_start>:
+   0:   eb000000        bl      8 <hello_world>
+   4:   eb00000b        bl      38 <exit>
+
+00000008 <hello_world>:
+   8:   e92d4ff0        push    {r4, r5, r6, r7, r8, r9, sl, fp, lr}
+   c:   e1a0b00d        mov     fp, sp
+  10:   e24dd040        sub     sp, sp, #64     ; 0x40
+  14:   e59f1030        ldr     r1, [pc, #48]   ; 4c <exit+0x14>
+  18:   e50b1010        str     r1, [fp, #-16]
+  1c:   e3a07004        mov     r7, #4
+  20:   e3a00001        mov     r0, #1
+  24:   e59f1024        ldr     r1, [pc, #36]   ; 50 <exit+0x18>
+  28:   e3a0200d        mov     r2, #13
+  2c:   ef000000        svc     0x00000000
+  30:   e1a0d00b        mov     sp, fp
+  34:   e8bd8ff0        pop     {r4, r5, r6, r7, r8, r9, sl, fp, pc}
+
+00000038 <exit>:
+  38:   e92d4800        push    {fp, lr}
+  3c:   e3a07001        mov     r7, #1
+  40:   e3a00041        mov     r0, #65 ; 0x41
+  44:   ef000000        svc     0x00000000
+  48:   e8bd8800        pop     {fp, pc}
+  4c:   00001337        .word   0x00001337
+  50:   00000000        .word   0x00000000
 ```
 
+## 5. Mixing `c` and `asm`
+The toolchain thas has *hf* (hardware FPU) in it means the processor has Floating Point Unit.
+
+* [do arm processors float?](https://youtu.be/MnMUH_mzfOw)
+
+```sh
+$ arm-linux-gnueabihf-gcc -static -o calc float.s calc.c 
+$ ./calc
+2.898000
+$ python3 
+Python 3.8.10 (default, Jun  2 2021, 10:49:15) 
+[GCC 9.4.0] on linux
+Type "help", "copyright", "credits" or "license" for more information.
+>>> 4.20*.69
+2.8979999999999997
+>>> 
+```
 
 ## Linux System Call Table
 arm (32-bit/EABI)
