@@ -3,9 +3,9 @@ Learn ARM assembly language (with cross compiler).
 
 * [ARM assembly language](https://youtu.be/FV6P5eRmMh8)
 * [Emulating ARM with QEMU on Debian/Ubuntu](https://gist.github.com/luk6xff/9f8d2520530a823944355e59343eadc1)
-* [ARM System Call Table](https://chromium.googlesource.com/chromiumos/docs/+/master/constants/syscalls.md#arm-32_bit_EABI)
 * [THUMB Mode](https://youtu.be/rsg_Krh-o1U)
 * [Low Level Learning github](https://github.com/lowlevellearning)
+* [embedded programming](https://jumpnowtek.com/)
 
 > Google 'arm 32 system call table', then select 'arm (32-bit/EABI)'.
 ## 1. Installation
@@ -43,7 +43,7 @@ $ file 001.o
 001.o: ELF 32-bit LSB relocatable, ARM, EABI5 version 1 (SYSV), not stripped
 
 # Linker
-$ arm-linux-gnueabi-gcc-9 001.o -o 001.elf
+$ arm-linux-gnueabi-ld 001.o -o 001.elf
 /usr/lib/gcc-cross/arm-linux-gnueabi/9/../../../../arm-linux-gnueabi/bin/ld: 001.o: in function `_start':
 (.text+0x0): multiple definition of `_start'; /usr/lib/gcc-cross/arm-linux-gnueabi/9/../../../../arm-linux-gnueabi/lib/../lib/crt1.o:(.text+0x0): first defined here
 /usr/lib/gcc-cross/arm-linux-gnueabi/9/../../../../arm-linux-gnueabi/bin/ld: /usr/lib/gcc-cross/arm-linux-gnueabi/9/../../../../arm-linux-gnueabi/lib/../lib/crt1.o: in function `_start':
@@ -51,7 +51,7 @@ $ arm-linux-gnueabi-gcc-9 001.o -o 001.elf
 collect2: error: ld returned 1 exit status'
 
 # Issue: automatically linked with libc and the _start was redefined
-$ arm-linux-gnueabi-gcc-9 001.o -o 001.elf -nostdlib
+$ arm-linux-gnueabi-ld 001.o -o 001.elf -nostdlib
 $ file 001.elf
 001.elf: ELF 32-bit LSB executable, ARM, EABI5 version 1 (SYSV), statically linked, BuildID[sha1]=f87b884f2a0392e29aa93715cd8981bb304866e1, not stripped
 ```
@@ -66,13 +66,13 @@ qemu: uncaught target signal 4 (Illegal instruction) - core dumped
 Illegal instruction
 
 $ arm-linux-gnueabi-as 002.asm -o 002.o
-$ arm-linux-gnueabi-gcc-9 002.o -o 002.elf -nostdlib
+$ arm-linux-gnueabi-ld 002.o -o 002.elf -nostdlib
 $ ./002.elf
 $ echo $?
 13
 
 $ arm-linux-gnueabi-as 003.asm -o 003.o
-$ arm-linux-gnueabi-gcc-9 003.o -o 003.elf -nostdlib
+$ arm-linux-gnueabi-ld 003.o -o 003.elf -nostdlib
 $ ./003.elf 
 Hello, World
 ```
@@ -118,7 +118,7 @@ _start:
 Output:
 ```sh
 $ arm-linux-gnueabi-as 004.asm -o 004.o
-$ arm-linux-gnueabi-gcc-9 004.o -o 004.elf -nostdlib
+$ arm-linux-gnueabi-ld 004.o -o 004.elf -nostdlib
 $ ./004.elf 
 Hello, World
 $ echo $?
@@ -259,7 +259,7 @@ exit:
 Output:
 ```sh
 
-$ arm-linux-gnueabi-gcc-9 005.o -o 005.elf -nostdlib -static
+$ arm-linux-gnueabi-ld 005.o -o 005.elf -nostdlib -static
 $ ./005.elf 
 Hello, World
 
@@ -323,7 +323,7 @@ Output:
 ```sh
 
 $ arm-linux-gnueabi-as 005.asm -o 005.o
-$ arm-linux-gnueabi-gcc-9 005.o -o 005.elf -nostdlib -static
+$ arm-linux-gnueabi-ld 005.o -o 005.elf -nostdlib -static
 $ ./005.elf 
 Hello, World
 Hello, World
@@ -426,7 +426,7 @@ exit:
 Output:
 ```sh
 $ arm-linux-gnueabi-as 005.asm -o 005.o
-$ arm-linux-gnueabi-gcc-9 005.o -o 005.elf -nostdlib -static
+$ arm-linux-gnueabi-ld 005.o -o 005.elf -nostdlib -static
 $ ./005.elf 
 Hello, World
 Hello, World
@@ -525,7 +525,7 @@ exit:
 Output:
 ```sh
 $ arm-linux-gnueabi-as stack.asm -o stack.o
-$ arm-linux-gnueabi-gcc-9 stack.o -o stack.elf -nostdlib -static
+$ arm-linux-gnueabi-ld stack.o -o stack.elf -nostdlib -static
 $ ./stack.elf 
 Hello, World
 
@@ -624,7 +624,50 @@ $ arm-linux-gnueabi-objdump -d -S ./calc > calc.lst
 ...
 ```
 
+## ARM Linux commands
+
+```sh
+$ arm-linux-gnueabi
+arm-linux-gnueabi-addr2line       arm-linux-gnueabihf-addr2line
+arm-linux-gnueabi-ar              arm-linux-gnueabihf-ar
+arm-linux-gnueabi-as              arm-linux-gnueabihf-as
+arm-linux-gnueabi-c++filt         arm-linux-gnueabihf-c++filt
+arm-linux-gnueabi-cpp             arm-linux-gnueabihf-cpp
+arm-linux-gnueabi-cpp-9           arm-linux-gnueabihf-cpp-9
+arm-linux-gnueabi-dwp             arm-linux-gnueabihf-dwp
+arm-linux-gnueabi-elfedit         arm-linux-gnueabihf-elfedit
+arm-linux-gnueabi-gcc             arm-linux-gnueabihf-gcc
+arm-linux-gnueabi-ld           arm-linux-gnueabihf-gcc-9
+arm-linux-gnueabi-gcc-ar          arm-linux-gnueabihf-gcc-ar
+arm-linux-gnueabi-gcc-ar-9        arm-linux-gnueabihf-gcc-ar-9
+arm-linux-gnueabi-gcc-nm          arm-linux-gnueabihf-gcc-nm
+arm-linux-gnueabi-gcc-nm-9        arm-linux-gnueabihf-gcc-nm-9
+arm-linux-gnueabi-gcc-ranlib      arm-linux-gnueabihf-gcc-ranlib
+arm-linux-gnueabi-gcc-ranlib-9    arm-linux-gnueabihf-gcc-ranlib-9
+arm-linux-gnueabi-gcov            arm-linux-gnueabihf-gcov
+arm-linux-gnueabi-gcov-9          arm-linux-gnueabihf-gcov-9
+arm-linux-gnueabi-gcov-dump       arm-linux-gnueabihf-gcov-dump
+arm-linux-gnueabi-gcov-dump-9     arm-linux-gnueabihf-gcov-dump-9
+arm-linux-gnueabi-gcov-tool       arm-linux-gnueabihf-gcov-tool
+arm-linux-gnueabi-gcov-tool-9     arm-linux-gnueabihf-gcov-tool-9
+arm-linux-gnueabi-gprof           arm-linux-gnueabihf-gprof
+arm-linux-gnueabi-ld              arm-linux-gnueabihf-ld
+arm-linux-gnueabi-ld.bfd          arm-linux-gnueabihf-ld.bfd
+arm-linux-gnueabi-ld.gold         arm-linux-gnueabihf-ld.gold
+arm-linux-gnueabi-nm              arm-linux-gnueabihf-nm
+arm-linux-gnueabi-objcopy         arm-linux-gnueabihf-objcopy
+arm-linux-gnueabi-objdump         arm-linux-gnueabihf-objdump
+arm-linux-gnueabi-ranlib          arm-linux-gnueabihf-ranlib
+arm-linux-gnueabi-readelf         arm-linux-gnueabihf-readelf
+arm-linux-gnueabi-size            arm-linux-gnueabihf-size
+arm-linux-gnueabi-strings         arm-linux-gnueabihf-strings
+arm-linux-gnueabi-strip           arm-linux-gnueabihf-strip
+```
+
 ## Linux System Call Table
+
+* [ARM System Call Table](https://chromium.googlesource.com/chromiumos/docs/+/master/constants/syscalls.md#arm-32_bit_EABI)
+
 arm (32-bit/EABI)
 Compiled from Linux 4.14.0 headers.
 
