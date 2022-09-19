@@ -579,7 +579,49 @@ Python 3.8.10 (default, Jun  2 2021, 10:49:15)
 Type "help", "copyright", "credits" or "license" for more information.
 >>> 4.20*.69
 2.8979999999999997
->>> 
+>>> exit()
+
+$ arm-linux-gnueabi-objdump -d -S ./calc > calc.lst
+...
+00010424 <calc_float>:
+   10424:	4806      	ldr	r0, [pc, #24]	; (10440 <val2+0x6>)
+   10426:	ed90 0a00 	vldr	s0, [r0]
+   1042a:	4806      	ldr	r0, [pc, #24]	; (10444 <val2+0xa>)
+   1042c:	edd0 0a00 	vldr	s1, [r0]
+   10430:	ee20 0a20 	vmul.f32	s0, s0, s1
+   10434:	4770      	bx	lr
+
+00010436 <val1>:
+   10436:	6666      	.short	0x6666
+   10438:	4086      	.short	0x4086
+
+0001043a <val2>:
+   1043a:	a3d7      	.short	0xa3d7
+   1043c:	00003f30 	.word	0x00003f30
+   10440:	00010436 	.word	0x00010436
+   10444:	0001043a 	.word	0x0001043a
+
+00010448 <main>:
+   10448:	b580      	push	{r7, lr}
+   1044a:	b082      	sub	sp, #8
+   1044c:	af00      	add	r7, sp, #0
+   1044e:	f7ff ffe9 	bl	10424 <calc_float>
+   10452:	ed87 0a01 	vstr	s0, [r7, #4]
+   10456:	edd7 7a01 	vldr	s15, [r7, #4]
+   1045a:	eeb7 7ae7 	vcvt.f64.f32	d7, s15
+   1045e:	ec53 2b17 	vmov	r2, r3, d7
+   10462:	4905      	ldr	r1, [pc, #20]	; (10478 <main+0x30>)
+   10464:	4479      	add	r1, pc
+   10466:	4608      	mov	r0, r1
+   10468:	f004 fa1a 	bl	148a0 <_IO_printf>
+   1046c:	2300      	movs	r3, #0
+   1046e:	4618      	mov	r0, r3
+   10470:	3708      	adds	r7, #8
+   10472:	46bd      	mov	sp, r7
+   10474:	bd80      	pop	{r7, pc}
+   10476:	bf00      	nop
+   10478:	000399d8 	.word	0x000399d8
+...
 ```
 
 ## Linux System Call Table
